@@ -1,1 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MT5 // LIVE TERMINAL</title>
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/static/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- Animated background layers -->
+  <div class="bg-grid"></div>
+  <div class="bg-scanlines"></div>
+  <div class="bg-blob blob-cyan"></div>
+  <div class="bg-blob blob-magenta"></div>
+  <div class="bg-blob blob-yellow"></div>
+
+  <main class="terminal">
+
+    <!-- ============ HEADER ============ -->
+    <header class="topbar">
+      <div class="brand">
+        <span class="logo-mark">◆</span>
+        <h1>MT5<span class="brand-sep">//</span><em>LIVE TERMINAL</em></h1>
+      </div>
+      <div class="topbar-meta">
+        <div class="meta-pill">
+          <span class="meta-label">ACCOUNT</span>
+          <span class="meta-value" id="acct-login">— — —</span>
+        </div>
+        <div class="meta-pill">
+          <span class="meta-label">SERVER</span>
+          <span class="meta-value" id="acct-server">—</span>
+        </div>
+        <div class="status-pill" id="conn-status">
+          <span class="status-dot"></span>
+          <span class="status-text">CONNECTING</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- ============ HERO STATS ============ -->
+    <section class="hero">
+
+      <div class="hero-grid">
+        <div class="stat-card stat-primary" data-accent="cyan">
+          <div class="stat-label">BALANCE</div>
+          <div class="stat-value" id="stat-balance">0.00</div>
+          <div class="stat-sub" id="stat-balance-ccy">USD</div>
+        </div>
+
+        <div class="stat-card stat-primary" data-accent="magenta">
+          <div class="stat-label">EQUITY</div>
+          <div class="stat-value" id="stat-equity">0.00</div>
+          <div class="stat-sub" id="stat-equity-ccy">USD</div>
+        </div>
+
+        <div class="stat-card stat-primary" data-accent="yellow">
+          <div class="stat-label">TODAY P&amp;L</div>
+          <div class="stat-value" id="stat-today">0.00</div>
+          <div class="stat-sub">REALISED · SESSION</div>
+        </div>
+
+        <div class="stat-card stat-primary" data-accent="cyan">
+          <div class="stat-label">OPEN P&amp;L</div>
+          <div class="stat-value" id="stat-open">0.00</div>
+          <div class="stat-sub">UNREALISED · FLOATING</div>
+        </div>
+      </div>
+
+      <div class="hero-substats">
+        <div class="substat">
+          <span class="substat-label">MARGIN</span>
+          <span class="substat-value" id="stat-margin">0.00</span>
+        </div>
+        <div class="substat-divider"></div>
+        <div class="substat">
+          <span class="substat-label">FREE MARGIN</span>
+          <span class="substat-value" id="stat-free-margin">0.00</span>
+        </div>
+        <div class="substat-divider"></div>
+        <div class="substat">
+          <span class="substat-label">LEVERAGE</span>
+          <span class="substat-value" id="stat-leverage">1:0</span>
+        </div>
+        <div class="substat-divider"></div>
+        <div class="substat">
+          <span class="substat-label">MARGIN LVL</span>
+          <span class="substat-value" id="stat-margin-level">0.0%</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ EQUITY CURVE ============ -->
+    <section class="panel panel-chart">
+      <div class="panel-header">
+        <h2>EQUITY CURVE</h2>
+        <span class="panel-sub">LAST 90D · LIVE</span>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="equityChart"></canvas>
+      </div>
+    </section>
+
+    <!-- ============ OPEN POSITIONS ============ -->
+    <section class="panel panel-positions">
+      <div class="panel-header">
+        <h2>OPEN POSITIONS</h2>
+        <span class="panel-sub"><span id="pos-count">0</span> ACTIVE</span>
+      </div>
+      <div class="table-wrap">
+        <table class="positions-table">
+          <thead>
+            <tr>
+              <th>SYMBOL</th>
+              <th>SIDE</th>
+              <th class="num">VOLUME</th>
+              <th class="num">ENTRY</th>
+              <th class="num">CURRENT</th>
+              <th class="num">P&amp;L</th>
+            </tr>
+          </thead>
+          <tbody id="positions-body">
+            <tr class="empty-row"><td colspan="6">— NO OPEN POSITIONS —</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ TRADING STATISTICS ============ -->
+    <section class="panel stats-panel">
+      <div class="panel-header">
+        <h2>TRADING STATISTICS</h2>
+        <span class="panel-sub">LAST 90D</span>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-tile">
+          <div class="label">TOTAL TRADES</div>
+          <div class="val" id="stat-total_trades">—</div>
+        </div>
+        <div class="stat-tile">
+          <div class="label">WIN RATE</div>
+          <div class="val" id="stat-win_rate">—</div>
+        </div>
+        <div class="stat-tile">
+          <div class="label">PROFIT FACTOR</div>
+          <div class="val" id="stat-profit_factor">—</div>
+        </div>
+        <div class="stat-tile">
+          <div class="label">NET P&amp;L</div>
+          <div class="val" id="stat-total_profit">—</div>
+        </div>
+        <div class="stat-tile">
+          <div class="label">AVG WIN</div>
+          <div class="val" id="stat-avg_win">—</div>
+        </div>
+        <div class="stat-tile">
+          <div class="label">AVG LOSS</div>
+          <div class="val" id="stat-avg_loss">—</div>
+        </div>
+        <div class="stat-tile">
+          <div class="label">LARGEST WIN</div>
+          <div class="val" id="stat-largest_win">—</div>
+        </div>
+        <div class="stat-tile">
+          <div class="label">LARGEST LOSS</div>
+          <div class="val" id="stat-largest_loss">—</div>
+        </div>
+        <div class="stat-tile">
+          <div class="label">WIN STREAK</div>
+          <div class="val" id="stat-max_win_streak">—</div>
+        </div>
+        <div class="stat-tile">
+          <div class="label">LOSS STREAK</div>
+          <div class="val" id="stat-max_loss_streak">—</div>
+        </div>
+        <div class="stat-tile">
+          <div class="label">AVG HOLD</div>
+          <div class="val" id="stat-avg_duration_minutes">—</div>
+        </div>
+        <div class="stat-tile">
+          <div class="label">MOST TRADED</div>
+          <div class="val" id="stat-most_traded_symbol">—</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ DRAWDOWN ============ -->
+    <section class="panel drawdown-panel">
+      <div class="panel-header">
+        <h2>DRAWDOWN</h2>
+        <span class="panel-sub" id="dd-status">—</span>
+      </div>
+      <div class="dd-body">
+        <div class="dd-stats">
+          <div class="dd-stat">
+            <div class="label">CURRENT</div>
+            <div class="val" id="dd-current">—</div>
+          </div>
+          <div class="dd-stat">
+            <div class="label">MAX EVER</div>
+            <div class="val" id="dd-max">—</div>
+          </div>
+          <div class="dd-stat">
+            <div class="label">PEAK EQUITY</div>
+            <div class="val" id="dd-peak">—</div>
+          </div>
+        </div>
+        <div class="dd-bar">
+          <div class="dd-bar-fill" id="dd-bar-fill"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PER SYMBOL ============ -->
+    <section class="panel by-symbol-panel">
+      <div class="panel-header">
+        <h2>PER SYMBOL</h2>
+        <span class="panel-sub">90D</span>
+      </div>
+      <div class="table-wrap">
+        <table class="positions-table by-symbol-table">
+          <thead>
+            <tr>
+              <th>SYMBOL</th>
+              <th class="num">TRADES</th>
+              <th class="num">WIN %</th>
+              <th class="num">NET P&amp;L</th>
+            </tr>
+          </thead>
+          <tbody id="per-symbol-body">
+            <tr class="empty-row"><td colspan="4">— NO CLOSED TRADES YET —</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ HOURLY HEATMAP ============ -->
+    <section class="panel heatmap-panel">
+      <div class="panel-header">
+        <h2>HOURLY P&amp;L HEATMAP</h2>
+        <span class="panel-sub">UTC HOURS</span>
+      </div>
+      <div class="heatmap" id="hourly-heatmap"></div>
+    </section>
+
+    <!-- ============ WEEKDAY P&L ============ -->
+    <section class="panel weekday-panel">
+      <div class="panel-header">
+        <h2>WEEKDAY P&amp;L</h2>
+        <span class="panel-sub">LAST 90D</span>
+      </div>
+      <div class="weekday-grid" id="weekday-grid"></div>
+    </section>
+
+    <!-- ============ LIVE TICKS ============ -->
+    <section class="panel ticks-panel">
+      <div class="panel-header">
+        <h2>LIVE TICKS</h2>
+        <span class="panel-sub">REAL TIME</span>
+      </div>
+      <div class="ticks-grid" id="ticks-grid"></div>
+    </section>
+
+    <footer class="footer">
+      <span>MT5 · LIVE · <span id="footer-clock">--:--:--</span></span>
+      <span class="footer-spacer">/</span>
+      <span>TICK <span id="footer-tick">0</span></span>
+    </footer>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
